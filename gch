@@ -36,12 +36,12 @@ ask_question() {
 
 # Check if git command exists
 if ! command -v git &> /dev/null; then
-  throw_error "git is not installed"
+  throw_error "git is not installed (https://git-scm.com/downloads)"
 fi
 
 # Check if jq command exists
 if ! command -v jq &> /dev/null; then
-  throw_error "jq is not installed"
+  throw_error "jq is not installed (https://jqlang.github.io/jq/download)"
 fi
 
 # Get config file
@@ -82,12 +82,13 @@ fi
 
 # Create output file if does not exist
 if [ ! -f "$output_file" ]; then
-  touch "$output_file" || throw_error "failed to create output file ${output_file}"
+  touch "$output_file" || throw_error "failed to create ${output_file} file"
+  print_success "new file ${output_file} created"
 fi
 
 # Check write permission for output file
 if [ ! -w "$output_file" ]; then
-  throw_error "unable to write to ${output_file} file"
+  throw_error "no permission to write to ${output_file} file"
 fi
 
 # Clean up output file
@@ -154,23 +155,23 @@ fi
 
 # Print total commits written count / total commits count
 echo "------------------------------------------------"
-echo -e "Total: $( [ "$total_commits_written_count" -eq "$total_commits_count" ] && echo -e "${GREEN}" || echo -e "${RED}")${total_commits_written_count}/${total_commits_count} commit(s) written${RESET}\n"
+echo -e "Total: $( [ "$total_commits_written_count" -eq "$total_commits_count" ] && echo -e "${GREEN}" || echo -e "${RED}")${total_commits_written_count}/${total_commits_count} commit(s) written${RESET}"
 
 # Detect new version (if last version does not exist, new version is set as the initial version)
 if [ -n "$last_version" ]; then
   if [ "$major_update" == true ]; then
     new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$1++; $2=0; $3=0; print}')
-    echo -e "${YELLOW}MAJOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+    echo -e "\n${YELLOW}MAJOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
   elif [ "$minor_update" == true ]; then
     new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$2++; $3=0; print}')
-    echo -e "${YELLOW}MINOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+    echo -e "\n${YELLOW}MINOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
   else
     new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$3++; print}')
-    echo -e "${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+    echo -e "\n${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
   fi
 else
   new_version="$config_initial_version"
-  echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
+  echo -e "\n${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
 # Ask for choose another version
@@ -187,7 +188,7 @@ if [ -n "$last_version" ]; then
 else
   echo "# Release ${new_version} ($(date +'%Y-%m-%d'))" | cat - "$output_file" > temp && mv temp "$output_file"
 fi
-print_success "changelog ${new_version} generated!\n"
+print_success "changelog ${new_version} generated!"
 
 # Ask for create new tag
 ask_question "Create new tag for this version?" "[Y/n]"
