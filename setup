@@ -46,7 +46,7 @@ if [ ! -d "$bin_dir" ]; then
   throw_error "directory ${bin_dir} not found"
 fi
 
-# Check if gch directory exists
+# Create gch directory if does not exist
 if [ ! -d "$gch_dir" ]; then
   sudo mkdir -p "$gch_dir" || throw_error "failed to create ${gch_dir} directory"
   print_success "new directory ${gch_dir} created"

@@ -33,7 +33,7 @@ sudo cp gch /usr/local/bin
 sudo mkdir -p /etc/gch
 sudo cp config.json /etc/gch
 ```
-4. Add `/usr/local/bin` directory to PATH **(only if not already in)**
+4. Add `/usr/local/bin` directory to PATH **(only if not already there)**
 ```bash
 echo "export PATH=\"/usr/local/bin:\$PATH\"" >> ~/.bashrc # or .zshrc
 source ~/.bashrc # or .zshrc

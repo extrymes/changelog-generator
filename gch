@@ -103,7 +103,7 @@ echo "------------------------------------------------"
 # Get commit types
 commit_types=($(jq -r '.commit_types[].type' "$config_file"))
 
-# Iterate through commit types, add commit type to regex and search for section commits
+# Iterate through commit types, add each commit type to regex and search for section commits
 for commit_type in "${commit_types[@]}"; do
   commit_types_regex+="${commit_types_regex:+|}${commit_type}"
   section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
