@@ -50,10 +50,6 @@ if [ ! -f "$config_file" ]; then
   throw_error "config file not found ${config_file}"
 fi
 
-# Get configuraton in config file
-config_initial_version=$(jq -r '.initial_version' "$config_file")
-config_commit_types=($(jq -r '.commit_types[].type' "$config_file"))
-
 # Get remote repository URL (without .git)
 repo_url=$(git remote get-url origin 2> /dev/null | sed 's/\.git$//')
 if [ -z "$repo_url" ]; then
@@ -103,6 +99,9 @@ regex_commit_types=""
 # Print output file
 echo -e "\n${YELLOW}Writing to file:${RESET} ${output_file}"
 echo "------------------------------------------------"
+
+# Get commit types
+commit_types=($(jq -r '.commit_types[].type' "$config_file"))
 
 # Iterate through commit types config, add commit type to regex and search for section commits
 for commit_type in "${config_commit_types[@]}"; do
@@ -170,7 +169,7 @@ if [ -n "$last_version" ]; then
     echo -e "\n${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
   fi
 else
-  new_version="$config_initial_version"
+  new_version=$(jq -r '.initial_version' "$config_file")
   echo -e "\n${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
