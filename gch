@@ -1,0 +1,195 @@
+#!/bin/bash
+
+# Configure bash options
+set -o pipefail
+
+# Configure colors
+RESET="\033[0m" # Reset color
+GRAY="\033[0;30m" # Gray
+RED="\033[0;31m" # Red
+GREEN="\033[0;32m" # Green
+YELLOW="\033[0;33m" # Yellow
+ORANGE="\033[38;5;208m" # Orange
+BLUE="\033[0;34m" # Blue
+CYAN="\033[0;36m" # Cyan
+
+# Print sucess message
+print_success() {
+  echo -e "${GREEN}success: ${1}${RESET}"
+}
+
+# Print warn message
+print_warn() {
+  echo -e "${ORANGE}warn: ${1}${RESET}"
+}
+
+# Throw error
+throw_error() {
+  echo -e "${RED}error: ${1}${RESET}"
+  exit 1
+}
+
+# Ask question
+ask_question() {
+  echo -e -n "${CYAN}${1} ${GRAY}(${2})${RESET} "
+}
+
+# Check if git command exists
+if ! command -v git &> /dev/null; then
+  throw_error "git is not installed"
+fi
+
+# Check if jq command exists
+if ! command -v jq &> /dev/null; then
+  throw_error "jq is not installed"
+fi
+
+# Get config file
+config_file="/etc/gch/config.json"
+if [ ! -f "$config_file" ]; then
+  throw_error "config file not found ${config_file}"
+fi
+
+# Get configuraton in config file
+config_output_file=$(jq -r '.output_file' "$config_file")
+config_initial_version=$(jq -r '.initial_version' "$config_file")
+config_commit_types=($(jq -r '.commit_types[].type' "$config_file"))
+
+# Get remote repository URL (without .git)
+repo_url=$(git remote get-url origin 2> /dev/null | sed 's/\.git$//')
+if [ -z "$repo_url" ]; then
+  throw_error "remote repository URL not found"
+fi
+
+# Get last tagged version and total commits count
+last_version=$(git describe --tags --abbrev=0 2> /dev/null)
+total_commits_count=$(git rev-list ${last_version:+${last_version}...}HEAD --count)
+
+# Check if commits exist
+if [ "$total_commits_count" -eq 0 ]; then
+  throw_error "no commit found ${last_version:+from ${last_version} }to HEAD"
+fi
+
+# Create output file if does not exist
+if [ ! -f "$config_output_file" ]; then
+  touch "$config_output_file" || throw_error "failed to create output file ${config_output_file}"
+fi
+
+# Check write permission for output file
+if [ ! -w "$config_output_file" ]; then
+  throw_error "unable to write to ${config_output_file} file"
+fi
+
+# Clean up output file
+> "$config_output_file"
+
+# Initialize global variables
+total_commits_written_count=0
+major_update=false
+minor_update=false
+regex_commit_types=""
+
+# Print output file
+echo -e "${YELLOW}Writing to file:${RESET} ${config_output_file}"
+echo "------------------------------------------------"
+
+# Iterate through commit types config, add commit type to regex and search for section commits
+for commit_type in "${config_commit_types[@]}"; do
+  regex_commit_types+="${regex_commit_types:+|}${commit_type}"
+  section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
+  section_commits_written_count=0
+  section_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -i "^[[:alnum:]]\+ ${commit_type}[:!(]")
+  printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
+  if [ -n "$section_commits" ]; then
+    echo -e "\n## ${section}" >> "$config_output_file"
+    # Iterate through commits, extract data and write to output file
+    while read -r commit; do
+      commit_hash=$(echo "$commit" | cut -d ' ' -f1)
+      commit_content=$(echo "$commit" | cut -d ' ' -f2-)
+      commit_scope=$(echo "$commit_content" | cut -d ':' -f1 | awk -F '[()]' '{print $2}' | sed 's/ //g')
+      commit_message=$(echo "$commit_content" | cut -d ':' -f2- | sed 's/^ *//')
+      commit_body_footer=$(git log -n 1 --pretty=format:'%b' "$commit_hash")
+      commit_refs=$(echo "$commit_body_footer" | grep -o '#[0-9]\+' | tr '\n' ' ' | sed 's/ $//')
+      breaking_change=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.*)}!:" || echo "$commit_body_footer" | grep -i "breaking change")
+      [ -n "$breaking_change" ] && major_update=true || [ "$commit_type" == "feat" ] && minor_update=true
+      commit_entry="- ${breaking_change:+[⚠️ BREAKING CHANGE] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
+      echo "${commit_entry}" >> "$config_output_file"
+      ((total_commits_written_count++))
+      ((section_commits_written_count++))
+      printf "\r%-25s${BLUE}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
+    done <<< "$section_commits"
+  fi
+  printf "\n"
+done
+
+# Search for unconventional commits
+nc_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]+ (${regex_commit_types})[:!(]")
+if [ -n "$nc_commits" ]; then
+  nc_section="Unconventional commits"
+  nc_commits_written_count=0
+  printf "${GRAY}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "${nc_section}"
+  echo -e "\n## ${nc_section}" >> "$config_output_file"
+  # Iterate through unconventional commits, extract data and write to output file
+  while read -r commit; do
+    commit_hash=$(echo "$commit" | cut -d ' ' -f1)
+    commit_content=$(echo "$commit" | cut -d ' ' -f2-)
+    commit_entry="- ${commit_content} ([${commit_hash}](${repo_url}/commit/${commit_hash}))"
+    echo -e "${commit_entry}" >> "$config_output_file"
+    ((total_commits_written_count++))
+    ((nc_commits_written_count++))
+    printf "\r${RED}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "$nc_section"
+  done <<< "$nc_commits"
+  printf "\n"
+fi
+
+# Print total commits written count / total commits count
+echo "------------------------------------------------"
+echo -e "Total: $( [ "$total_commits_written_count" -eq "$total_commits_count" ] && echo -e "${GREEN}" || echo -e "${RED}")${total_commits_written_count}/${total_commits_count} commit(s) written${RESET}\n"
+
+# Detect new version (if last version does not exist, new version is set as the initial version)
+if [ -n "$last_version" ]; then
+  if [ "$major_update" == true ]; then
+    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$1++; $2=0; $3=0; print}')
+    echo -e "${YELLOW}MAJOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+  elif [ "$minor_update" == true ]; then
+    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$2++; $3=0; print}')
+    echo -e "${YELLOW}MINOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+  else
+    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$3++; print}')
+    echo -e "${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+  fi
+else
+  new_version="$config_initial_version"
+  echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
+fi
+
+# Ask for choose another version
+ask_question "Choose another version?" "press [Enter] to skip"
+read -r another_version
+if [ -n "$another_version" ]; then
+  new_version="$another_version"
+fi
+
+# Get comparison URL if last version exists and write changelog title at the beginning of output file
+if [ -n "$last_version" ]; then
+  comparison_url="${repo_url}/compare/${last_version}...${new_version}"
+  echo "# Release [${new_version}](${comparison_url}) ($(date +'%Y-%m-%d'))" | cat - $config_output_file > temp && mv temp $config_output_file
+else
+  echo "# Release ${new_version} ($(date +'%Y-%m-%d'))" | cat - $config_output_file > temp && mv temp $config_output_file
+fi
+print_success "changelog ${new_version} generated!\n"
+
+# Ask for create new tag
+ask_question "Create new tag for this version?" "[Y/n]"
+read -r create_new_tag
+lw_create_new_tag=$(echo "$create_new_tag" | tr '[:upper:]' '[:lower:]')
+if [ "$lw_create_new_tag" != "n" ]; then
+  if git tag "$new_version" &> /dev/null; then
+    print_success "new tag ${new_version} created"
+  else
+    print_warn "failed to create tag ${new_version}"
+  fi
+fi
+
+# Exit script
+exit 0

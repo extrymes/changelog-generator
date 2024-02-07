@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Configure bash options
+set -o pipefail
+
+# Configure colors
+RESET="\033[0m" # Reset color
+RED="\033[0;31m" # Red
+GREEN="\033[0;32m" # Green
+ORANGE="\033[38;5;208m" # Orange
+
+# Set files and directories
+gch_file="gch"
+config_file="config.json"
+bin_dir="/usr/local/bin"
+gch_dir="/etc/gch"
+
+# Print sucess message
+print_success() {
+  echo -e "${GREEN}success: ${1}${RESET}"
+}
+
+# Print warn message
+print_warn() {
+  echo -e "${ORANGE}warn: ${1}${RESET}"
+}
+
+# Throw error
+throw_error() {
+  echo -e "${RED}error: ${1}${RESET}"
+  exit 1
+}
+
+# Check if gch file exists
+if [ ! -f "$gch_file" ]; then
+  throw_error "${gch_file} file not found"
+fi
+
+# Check if config file exists
+if [ ! -f "$config_file" ]; then
+  throw_error "${config_file} file not found"
+fi
+
+# Check if bin directory exists
+if [ ! -d "$bin_dir" ]; then
+  throw_error "directory ${bin_dir} not found"
+fi
+
+# Check if gch directory exists
+if [ ! -d "$gch_dir" ]; then
+  sudo mkdir -p "$gch_dir" || throw_error "failed to create ${gch_dir} directory"
+  print_success "new directory ${gch_dir} created"
+fi
+
+# Make gch file executable
+chmod +x "$gch_file"
+
+# Copy gch file to bin directory
+sudo cp "$gch_file" "$bin_dir" || throw_error "failed to copy ${gch_file} file to ${bin_dir}"
+print_success "${gch_file} file copied to ${bin_dir}"
+
+# Copy config file to gch directory
+sudo cp "$config_file" "$gch_dir" || throw_error "failed to copy ${config_file} file to ${gch_dir}"
+print_success "${config_file} file copied to ${gch_dir}"
+
+# Check if bin directory is in PATH
+if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
+  print_warn "directory ${bin_dir} is not in PATH"
+  # Get shell config file
+  shell_config_file="$HOME/.$(basename "$SHELL")rc"
+  if [ ! -f "$shell_config_file" ]; then
+    throw_error "shell config file not found"
+  fi
+  # Update shell config file
+  echo "export PATH=\"${bin_dir}:\$PATH\"" >> "$shell_config_file"
+  source "$shell_config_file" || print_warn "failed to reload ${shell_config_file} file"
+  print_success "directory ${bin_dir} added to PATH"
+fi
