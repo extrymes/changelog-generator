@@ -94,7 +94,7 @@ fi
 total_commits_written_count=0
 major_update=false
 minor_update=false
-regex_commit_types=""
+commit_types_regex=""
 
 # Print output file
 echo -e "\n${YELLOW}Writing to file:${RESET} ${output_file}"
@@ -103,9 +103,9 @@ echo "------------------------------------------------"
 # Get commit types
 commit_types=($(jq -r '.commit_types[].type' "$config_file"))
 
-# Iterate through commit types config, add commit type to regex and search for section commits
-for commit_type in "${config_commit_types[@]}"; do
-  regex_commit_types+="${regex_commit_types:+|}${commit_type}"
+# Iterate through commit types, add commit type to regex and search for section commits
+for commit_type in "${commit_types[@]}"; do
+  commit_types_regex+="${commit_types_regex:+|}${commit_type}"
   section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
   section_commits_written_count=0
   section_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -i "^[[:alnum:]]\+ ${commit_type}[:!(]")
@@ -133,7 +133,7 @@ for commit_type in "${config_commit_types[@]}"; do
 done
 
 # Search for unconventional commits
-nc_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]+ (${regex_commit_types})[:!(]")
+nc_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]+ (${commit_types_regex})[:!(]")
 if [ -n "$nc_commits" ]; then
   nc_section="Unconventional commits"
   nc_commits_written_count=0
