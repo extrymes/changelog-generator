@@ -51,7 +51,6 @@ if [ ! -f "$config_file" ]; then
 fi
 
 # Get configuraton in config file
-config_output_file=$(jq -r '.output_file' "$config_file")
 config_initial_version=$(jq -r '.initial_version' "$config_file")
 config_commit_types=($(jq -r '.commit_types[].type' "$config_file"))
 
@@ -70,18 +69,29 @@ if [ "$total_commits_count" -eq 0 ]; then
   throw_error "no commit found ${last_version:+from ${last_version} }to HEAD"
 fi
 
+# Get output file
+output_file=($(jq -r '.output_file' "$config_file"))
+
+# Ask for choose another output file
+echo -e "${YELLOW}Output file:${RESET} ${output_file}"
+ask_question "Choose another file ?" "press [Enter] to skip"
+read -r another_output_file
+if [ -n "$another_output_file" ]; then
+  output_file="$another_output_file"
+fi
+
 # Create output file if does not exist
-if [ ! -f "$config_output_file" ]; then
-  touch "$config_output_file" || throw_error "failed to create output file ${config_output_file}"
+if [ ! -f "$output_file" ]; then
+  touch "$output_file" || throw_error "failed to create output file ${output_file}"
 fi
 
 # Check write permission for output file
-if [ ! -w "$config_output_file" ]; then
-  throw_error "unable to write to ${config_output_file} file"
+if [ ! -w "$output_file" ]; then
+  throw_error "unable to write to ${output_file} file"
 fi
 
 # Clean up output file
-> "$config_output_file"
+> "$output_file"
 
 # Initialize global variables
 total_commits_written_count=0
@@ -90,7 +100,7 @@ minor_update=false
 regex_commit_types=""
 
 # Print output file
-echo -e "${YELLOW}Writing to file:${RESET} ${config_output_file}"
+echo -e "\n${YELLOW}Writing to file:${RESET} ${output_file}"
 echo "------------------------------------------------"
 
 # Iterate through commit types config, add commit type to regex and search for section commits
@@ -101,7 +111,7 @@ for commit_type in "${config_commit_types[@]}"; do
   section_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -i "^[[:alnum:]]\+ ${commit_type}[:!(]")
   printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
   if [ -n "$section_commits" ]; then
-    echo -e "\n## ${section}" >> "$config_output_file"
+    echo -e "\n## ${section}" >> "$output_file"
     # Iterate through commits, extract data and write to output file
     while read -r commit; do
       commit_hash=$(echo "$commit" | cut -d ' ' -f1)
@@ -113,7 +123,7 @@ for commit_type in "${config_commit_types[@]}"; do
       breaking_change=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.*)}!:" || echo "$commit_body_footer" | grep -i "breaking change")
       [ -n "$breaking_change" ] && major_update=true || [ "$commit_type" == "feat" ] && minor_update=true
       commit_entry="- ${breaking_change:+[⚠️ BREAKING CHANGE] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
-      echo "${commit_entry}" >> "$config_output_file"
+      echo "${commit_entry}" >> "$output_file"
       ((total_commits_written_count++))
       ((section_commits_written_count++))
       printf "\r%-25s${BLUE}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
@@ -128,13 +138,13 @@ if [ -n "$nc_commits" ]; then
   nc_section="Unconventional commits"
   nc_commits_written_count=0
   printf "${GRAY}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "${nc_section}"
-  echo -e "\n## ${nc_section}" >> "$config_output_file"
+  echo -e "\n## ${nc_section}" >> "$output_file"
   # Iterate through unconventional commits, extract data and write to output file
   while read -r commit; do
     commit_hash=$(echo "$commit" | cut -d ' ' -f1)
     commit_content=$(echo "$commit" | cut -d ' ' -f2-)
     commit_entry="- ${commit_content} ([${commit_hash}](${repo_url}/commit/${commit_hash}))"
-    echo -e "${commit_entry}" >> "$config_output_file"
+    echo -e "${commit_entry}" >> "$output_file"
     ((total_commits_written_count++))
     ((nc_commits_written_count++))
     printf "\r${RED}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "$nc_section"
@@ -173,9 +183,9 @@ fi
 # Get comparison URL if last version exists and write changelog title at the beginning of output file
 if [ -n "$last_version" ]; then
   comparison_url="${repo_url}/compare/${last_version}...${new_version}"
-  echo "# Release [${new_version}](${comparison_url}) ($(date +'%Y-%m-%d'))" | cat - $config_output_file > temp && mv temp $config_output_file
+  echo "# Release [${new_version}](${comparison_url}) ($(date +'%Y-%m-%d'))" | cat - "$output_file" > temp && mv temp "$output_file"
 else
-  echo "# Release ${new_version} ($(date +'%Y-%m-%d'))" | cat - $config_output_file > temp && mv temp $config_output_file
+  echo "# Release ${new_version} ($(date +'%Y-%m-%d'))" | cat - "$output_file" > temp && mv temp "$output_file"
 fi
 print_success "changelog ${new_version} generated!\n"
 
