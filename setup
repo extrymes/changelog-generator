@@ -36,6 +36,12 @@ if [ ! -f "$gch_file" ]; then
   throw_error "${gch_file} file not found"
 fi
 
+# Make gch file executable if is not
+if [ ! -x "$gch_file" ]; then
+  chmod +x "$gch_file" || throw_error "failed to make ${gch_file} file executable"
+  print_success "${gch_file} file made executable"
+fi
+
 # Check if config file exists
 if [ ! -f "$config_file" ]; then
   throw_error "${config_file} file not found"
@@ -51,9 +57,6 @@ if [ ! -d "$gch_dir" ]; then
   sudo mkdir -p "$gch_dir" || throw_error "failed to create ${gch_dir} directory"
   print_success "new directory ${gch_dir} created"
 fi
-
-# Make gch file executable
-chmod +x "$gch_file"
 
 # Copy gch file to bin directory
 sudo cp "$gch_file" "$bin_dir" || throw_error "failed to copy ${gch_file} file to ${bin_dir}"
