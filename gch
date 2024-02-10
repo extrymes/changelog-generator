@@ -29,8 +29,8 @@ throw_error() {
   exit 1
 }
 
-# Ask question
-ask_question() {
+# Ask user
+ask_user() {
   echo -e -n "${CYAN}${1} ${GRAY}(${2})${RESET} "
 }
 
@@ -58,9 +58,9 @@ total_commits_count=$(git rev-list ${last_version:+${last_version}...}HEAD --cou
 # Get output file
 output_file=$(jq -r ".output_file" "$config_file")
 
-# Ask for choose another output file
+# Ask user for choose another output file
 echo -e "${YELLOW}Output file:${RESET} ${output_file}"
-ask_question "Choose another file ?" "press [Enter] to skip"
+ask_user "Choose another file ?" "press [Enter] to skip"
 read -r another_output_file
 [ -n "$another_output_file" ] && output_file="$another_output_file"
 
@@ -160,8 +160,8 @@ else
   echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
-# Ask for choose another version
-ask_question "Choose another version?" "press [Enter] to skip"
+# Ask user for choose another version
+ask_user "Choose another version?" "press [Enter] to skip"
 read -r another_version
 [ -n "$another_version" ] && new_version="$another_version"
 
@@ -174,8 +174,8 @@ else
 fi
 print_success "changelog ${new_version} generated!"
 
-# Ask for create new tag
-ask_question "Create new tag for this version?" "[Y/n]"
+# Ask user for create new tag
+ask_user "Create new tag for this version?" "[Y/n]"
 read -r create_new_tag
 lw_create_new_tag=$(echo "$create_new_tag" | tr '[:upper:]' '[:lower:]')
 if [ "$lw_create_new_tag" != "n" ]; then
