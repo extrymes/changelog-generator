@@ -57,6 +57,7 @@ total_commits_count=$(git rev-list ${last_version:+${last_version}...}HEAD --cou
 
 # Get output file
 output_file=$(jq -r ".output_file" "$config_file")
+[[ -z "$output_file" || "$output_file" == "null" ]] && print_warn "output file not found in config file" && output_file="CHANGELOG.md"
 
 # Ask user for choose another output file
 echo -e "${YELLOW}Output file:${RESET} ${output_file}"
@@ -87,12 +88,14 @@ echo -e "\n${YELLOW}Writing to file:${RESET} ${output_file}"
 echo "------------------------------------------------"
 
 # Get commit types
-commit_types=($(jq -r ".commit_types[].type" "$config_file"))
+commit_types=($(jq -r ".commit_types[].type" "$config_file" 2> /dev/null))
+[[ -z "$commit_types" || "$commit_types" == "null" ]] && throw_error "commit types not found in config file"
 
 # Iterate through commit types, search for section commits and add each commit type to regex
 for commit_type in "${commit_types[@]}"; do
   # Get section
   section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
+  [[ -z "$section" || "$section" == "null" ]] && print_warn "${commit_type} section not found in config file" && section="$commit_type"
   section_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -i "^[[:alnum:]]\+ ${commit_type}[:!(]")
   section_commits_written_count=0
   printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
@@ -157,6 +160,7 @@ if [ -n "$last_version" ]; then
   fi
 else
   new_version=$(jq -r ".initial_version" "$config_file")
+  [[ -z "$new_version" || "$new_version" == "null" ]] && print_warn "initial version not found in config file" && new_version="0.1.0"
   echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
