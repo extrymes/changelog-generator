@@ -63,8 +63,9 @@ if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
   # Get shell config file
   shell_config_file="$HOME/.$(basename "$SHELL")rc"
   [ -f "$shell_config_file" ] || throw_error "shell config file not found"
+  [ -w "$shell_config_file" ] || throw_error "no permission to write to ${output_file} file"
   # Update shell config file
-  echo "export PATH=\"${bin_dir}:\$PATH\"" >> "$shell_config_file"
+  echo "export PATH=\"${bin_dir}:\$PATH\"" >> "$shell_config_file" || throw_error "failed to write to ${shell_config_file} file"
   source "$shell_config_file" || print_warn "failed to reload ${shell_config_file} file"
   print_success "directory ${bin_dir} added to PATH"
 fi
