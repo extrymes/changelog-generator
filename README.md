@@ -3,9 +3,12 @@ A simple Bash script that generates a changelog from commits in a local reposito
 
 ## ✨ Features
 - Easy to use and setup
-- Automatically detects new versions
 - Configurable output file, commit types and sections
-- Conforms to [Conventional Commits](https://conventionalcommits.org)
+- Automatically detects major and minor updates and patches
+- Calculates new version based on the update
+- Commits new changelog with a customizable message
+- Creates new version tag
+- Conforms to [Conventional Commits](https://conventionalcommits.org) and [SemVer](https://semver.org)
 
 ## 📦 Dependencies
 - [git](https://git-scm.com)
