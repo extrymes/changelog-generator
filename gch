@@ -50,7 +50,7 @@ repo_url=$(git remote get-url origin 2> /dev/null | sed 's/\.git$//')
 
 # Get last tagged version and total commits count
 last_version=$(git describe --tags --abbrev=0 2> /dev/null)
-total_commits_count=$(git rev-list ${last_version:+${last_version}...}HEAD --count)
+total_commits_count=$(git rev-list ${last_version:+${last_version}...}HEAD --no-merges --count)
 
 # Check if commits exist
 [ "$total_commits_count" -gt 0 ] || throw_error "no commit found ${last_version:+from ${last_version} }to HEAD"
@@ -96,7 +96,7 @@ for commit_type in "${commit_types[@]}"; do
   # Get section
   section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
   [[ -z "$section" || "$section" == "null" ]] && print_warn "${commit_type} section not found in config file" && section="$commit_type"
-  section_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -Ei "^[[:alnum:]]{7} ${commit_type}(\(.+\))?(:|!:).+")
+  section_commits=$(git log ${last_version:+${last_version}...}HEAD --no-merges --pretty=format:'%h %s' --reverse | grep -Ei "^[[:alnum:]]{7} ${commit_type}(\(.+\))?(:|!:).+")
   section_commits_written_count=0
   printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
   if [ -n "$section_commits" ]; then
@@ -123,7 +123,7 @@ for commit_type in "${commit_types[@]}"; do
 done
 
 # Search for unconventional commits
-nc_commits=$(git log ${last_version:+${last_version}...}HEAD --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]{7} (${commit_types_regex})(\(.+\))?(:|!:).+")
+nc_commits=$(git log ${last_version:+${last_version}...}HEAD --no-merges --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]{7} (${commit_types_regex})(\(.+\))?(:|!:).+")
 if [ -n "$nc_commits" ]; then
   nc_section="Unconventional commits"
   nc_commits_written_count=0
