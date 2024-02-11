@@ -178,6 +178,21 @@ else
 fi
 print_success "changelog ${new_version} generated!"
 
+# Ask user for commit new changelog
+ask_user "Commit new changelog?" "[Y/n]"
+read -r commit_new_ch
+lw_commit_new_ch=$(echo "$commit_new_ch" | tr '[[:upper:]]' '[[:lower:]]')
+if [ "$lw_commit_new_ch" != "n" ]; then
+  # Get changelog commit message
+  ch_commit_message=$(jq -r ".commit_message" "$config_file" | sed "s/{old_v}/${last_version}/g; s/{new_v}/${new_version}/g")
+  [[ -z "$ch_commit_message" || "$ch_commit_message" == "null" ]] && print_warn "commit message not found in config file" && ch_commit_message="bump: version ${last_version} → ${new_version}"
+  if git add "$output_file" && git commit "$output_file" -m "$ch_commit_message" > /dev/null; then
+    print_success "new changelog committed"
+  else
+    print_warn "failed to commit changelog"
+  fi
+fi
+
 # Ask user for create new tag
 ask_user "Create new tag for this version?" "[Y/n]"
 read -r create_new_tag
