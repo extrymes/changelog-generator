@@ -178,6 +178,19 @@ else
 fi
 print_success "changelog ${new_version} generated!"
 
+# Ask user for bump version
+ask_user "Bump version?" "[Y/n]"
+read -r bump_version
+bump_version_lw=$(echo "$bump_version" | tr '[[:upper:]]' '[[:lower]]')
+if [ "$bump_version_lw" != "n" ]; then
+  bump_commit_entry="bump: version ${last_version:+${last_version} → }${new_version}"
+  if git add "$output_file" && git commit "$output_file" -m "$bump_commit_entry" > /dev/null && git tag "$new_version"; then
+    print_success "version bumped ${last_version:+from ${last_version} }to ${new_version}"
+  else
+    print_warn "failed to bump version"
+  fi
+fi
+
 # Ask user for commit new changelog
 ask_user "Commit new changelog?" "[Y/n]"
 read -r commit_new_ch
