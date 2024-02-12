@@ -69,3 +69,6 @@ if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
   source "$shell_config_file" || print_warn "failed to reload ${shell_config_file} file"
   print_success "directory ${bin_dir} added to PATH"
 fi
+
+# Exit script
+exit 0
