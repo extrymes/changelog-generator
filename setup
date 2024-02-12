@@ -5,8 +5,8 @@ set -o pipefail
 
 # Configure colors
 RESET="\033[0m" # Reset color
-RED="\033[0;31m" # Red
-GREEN="\033[0;32m" # Green
+RED="\033[31m" # Red
+GREEN="\033[32m" # Green
 ORANGE="\033[38;5;208m" # Orange
 
 # Set files and directories
