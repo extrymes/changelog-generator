@@ -5,8 +5,10 @@ set -o pipefail
 
 # Configure colors
 RESET="\033[0m" # Reset color
+BOLD="\033[1m" # Bold
 RED="\033[31m" # Red
 GREEN="\033[32m" # Green
+BLUE="\033[34m" # Blue
 ORANGE="\033[38;5;208m" # Orange
 
 # Set files and directories
@@ -69,6 +71,9 @@ if [[ ":$PATH:" != *":${bin_dir}:"* ]]; then
   source "$shell_config_file" || print_warn "failed to reload ${shell_config_file} file"
   print_success "directory ${bin_dir} added to PATH"
 fi
+
+# Print gch usage
+echo -e "You can now run ${BLUE}${BOLD}gch${RESET} in a local repository."
 
 # Exit script
 exit 0
