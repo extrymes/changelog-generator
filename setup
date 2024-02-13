@@ -47,16 +47,16 @@ fi
 
 # Create gch directory if does not exist
 if ! [ -d "$gch_dir" ]; then
-  sudo mkdir -p "$gch_dir" || throw_error "failed to create ${gch_dir} directory"
+  mkdir -p "$gch_dir" || throw_error "failed to create ${gch_dir} directory"
   print_success "new directory ${gch_dir} created"
 fi
 
 # Copy gch file to bin directory
-sudo cp "$gch_file" "$bin_dir" || throw_error "failed to copy ${gch_file} file to ${bin_dir}"
+cp "$gch_file" "$bin_dir" || throw_error "failed to copy ${gch_file} file to ${bin_dir}"
 print_success "${gch_file} file copied to ${bin_dir}"
 
 # Copy config file to gch directory
-sudo cp "$config_file" "$gch_dir" || throw_error "failed to copy ${config_file} file to ${gch_dir}"
+cp "$config_file" "$gch_dir" || throw_error "failed to copy ${config_file} file to ${gch_dir}"
 print_success "${config_file} file copied to ${gch_dir}"
 
 # Check if bin directory is in PATH
