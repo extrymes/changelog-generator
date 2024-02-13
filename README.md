@@ -19,7 +19,7 @@ Make sure you have installed the dependencies before proceeding. You can install
 1. Just run the `setup` file
 ```bash
 chmod +x setup
-./setup
+sudo ./setup
 ```
 ### Manually
 1. Make `gch` file executable
