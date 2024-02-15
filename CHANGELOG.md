@@ -1,16 +1,15 @@
-# Release [0.4.0](https://github.com/extrymes/changelog-generator/compare/0.3.0...0.4.0) (2024-02-12)
+# Release [0.5.0](https://github.com/extrymes/changelog-generator/compare/0.4.0...0.5.0) (2024-02-15)
 
 ## Features
-- **gch:** add option to bump version ([6c26781](https://github.com/extrymes/changelog-generator/commit/6c26781))
+- **gch:** Write breaking changes to output file ([3f2ae6e](https://github.com/extrymes/changelog-generator/commit/3f2ae6e))
+- **gch:** Capitalize first letter of commit message ([c0656da](https://github.com/extrymes/changelog-generator/commit/c0656da))
 
-## Refactor
-- clean code ([9345245](https://github.com/extrymes/changelog-generator/commit/9345245))
-- **setup:** exit script with code 0 ([ef6e61e](https://github.com/extrymes/changelog-generator/commit/ef6e61e))
+## Style
+- **gch:** Refine variable naming conventions ([fec3ea0](https://github.com/extrymes/changelog-generator/commit/fec3ea0))
 
 ## Chore
-- **gch:** remove unnecessary options to commit new changelog and create new tag ([b988634](https://github.com/extrymes/changelog-generator/commit/b988634))
-- **config:** remove unnecessary `commit_message` in config file ([63da172](https://github.com/extrymes/changelog-generator/commit/63da172))
-- **setup:** print gch usage in console ([9e49c4c](https://github.com/extrymes/changelog-generator/commit/9e49c4c))
+- **setup:** Stop using sudo for script commands ([bc29a09](https://github.com/extrymes/changelog-generator/commit/bc29a09))
+- **gch:** Change breaking change flag in commit entry ([89c7a2f](https://github.com/extrymes/changelog-generator/commit/89c7a2f))
 
 ## Documentation
-- update README.md ([c9ed0d1](https://github.com/extrymes/changelog-generator/commit/c9ed0d1))
+- Update README.md ([a711945](https://github.com/extrymes/changelog-generator/commit/a711945))
