@@ -106,7 +106,7 @@ for commit_type in "${commit_types[@]}"; do
       commit_hash=$(echo "$commit" | cut -d ' ' -f1)
       commit_content=$(echo "$commit" | cut -d ' ' -f2-)
       commit_scope=$(echo "$commit_content" | cut -d ':' -f1 | awk -F '[()]' '{print $2}' | sed 's/^ *//; s/ *$//')
-      commit_message=$(echo "$commit_content" | cut -d ':' -f2- | sed 's/^ *//')
+      commit_message=$(echo "$commit_content" | cut -d ':' -f2- | sed 's/^ *//' | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
       commit_body=$(git log -n 1 --pretty=format:'%b' "$commit_hash")
       commit_refs=$(echo "$commit_body" | grep -o '#[0-9]\+' | tr '\n' ',' | sed 's/,$//')
       commit_break=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.\+)}!:" || echo "$commit_body" | grep -i "breaking change:.\+")
