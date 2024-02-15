@@ -111,7 +111,7 @@ for commit_type in "${commit_types[@]}"; do
       commit_refs=$(echo "$commit_body" | grep -o '#[0-9]\+' | tr '\n' ',' | sed 's/,$//')
       commit_break=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.\+)}!:" || echo "$commit_body" | grep -i "breaking change")
       [ -n "$commit_break" ] && major_update=true || [ "$commit_type" == "feat" ] && minor_update=true
-      commit_entry="- ${commit_break:+[⚠️ BREAKING CHANGE] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
+      commit_entry="- ${commit_break:+[⚠] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
       echo "$commit_entry" >> "$output_file" || throw_error "failed to write to ${output_file} file"
       ((total_commits_written_count++))
       ((section_commits_written_count++))
