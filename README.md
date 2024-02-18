@@ -41,8 +41,15 @@ echo "export PATH=\"/usr/local/bin:\$PATH\"" >> ~/.bashrc # or .zshrc
 source ~/.bashrc # or .zshrc
 ```
 ## ⚙️ Configuration
-You can configure settings in `config.json` file and then run the `setup` file to copy changes or directly configure in `/etc/gch/config.json` file.
+You can configure these keys in config file:
+- `output_file`: The file to which the changelog will be written
+- `initial_version`: The version of the first update
+- `commit_types`: The array of commit types and sections
+> Run the `setup` file to copy changes or directly configure in `/etc/gch/config.json` file.
 
 ## 🚀 Getting started
 1. Go to a local repository
 2. Run `gch`
+
+## 📸 Showcase
+![showcase](https://i.imgur.com/YSu79Zc.png)
