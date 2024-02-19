@@ -44,8 +44,8 @@ command -v jq &> /dev/null || throw_error "jq is not installed (https://jqlang.g
 config_file="/etc/gch/config.json"
 [ -f "$config_file" ] || throw_error "file ${config_file} not found"
 
-# Get remote repository URL (without .git)
-repo_url=$(git remote get-url origin 2> /dev/null | sed 's/\.git$//')
+# Get remote repository URL (without SSH protocol and .git extension)
+repo_url=$(git remote get-url origin 2> /dev/null | sed 's/^git@/https:\/\//' | sed 's/\.com:/\.com\//' | sed 's/\.git$//')
 [ -n "$repo_url" ] || throw_error "remote repository URL not found"
 
 # Get last tagged version and total commits count
