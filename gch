@@ -4,14 +4,7 @@
 set -o pipefail
 
 # Configure colors
-RESET="\033[0m" # Reset color
-GRAY="\033[30m" # Gray
-RED="\033[31m" # Red
-GREEN="\033[32m" # Green
-YELLOW="\033[33m" # Yellow
-BLUE="\033[34m" # Blue
-CYAN="\033[36m" # Cyan
-ORANGE="\033[38;5;208m" # Orange
+RESET="\033[0m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; CYAN="\033[36m"; ORANGE="\033[38;5;208m"
 
 # Print sucess message
 print_success() {
@@ -78,10 +71,7 @@ fi
 > "$output_file" || throw_error "failed to write to ${output_file} file"
 
 # Initialize global variables
-total_commits_written_count=0
-major_update=false
-minor_update=false
-commit_types_regex=""
+total_commits_written_count=0; major_update=false; minor_update=false; commit_types_regex=""
 
 # Print output file
 echo -e "\n${YELLOW}Writing to file:${RESET} ${output_file}"
