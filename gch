@@ -75,7 +75,7 @@ fi
 [ -w "$output_file" ] || throw_error "no permission to write to ${output_file} file"
 
 # Clean up output file
-> "$output_file"
+> "$output_file" || throw_error "failed to write to ${output_file} file"
 
 # Initialize global variables
 total_commits_written_count=0
