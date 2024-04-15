@@ -1,18 +1,18 @@
 {
-  "output_file": "CHANGELOG.md",
-  "initial_version": "0.1.0",
-  "commit_types": [
-    { "type": "feat", "section": "Features" },
-    { "type": "fix", "section": "Bug Fixes" },
-    { "type": "refactor", "section": "Refactor" },
-    { "type": "perf", "section": "Performance" },
-    { "type": "revert", "section": "Reverts" },
-    { "type": "types", "section": "Typings" },
-    { "type": "style", "section": "Style" },
-    { "type": "chore", "section": "Chore" },
-    { "type": "test", "section": "Testing" },
-    { "type": "docs", "section": "Documentation" },
-    { "type": "build", "section": "Build" },
-    { "type": "ci", "section": "CI" }
-  ]
+	"output_file": "CHANGELOG.md",
+	"initial_version": "0.1.0",
+	"commit_types": [
+		{ "type": "feat", "section": "Features" },
+		{ "type": "fix", "section": "Bug Fixes" },
+		{ "type": "refactor", "section": "Refactor" },
+		{ "type": "perf", "section": "Performance" },
+		{ "type": "revert", "section": "Reverts" },
+		{ "type": "types", "section": "Typings" },
+		{ "type": "style", "section": "Style" },
+		{ "type": "chore", "section": "Chore" },
+		{ "type": "test", "section": "Testing" },
+		{ "type": "docs", "section": "Documentation" },
+		{ "type": "build", "section": "Build" },
+		{ "type": "ci", "section": "CI" }
+	]
 }

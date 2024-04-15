@@ -8,23 +8,23 @@ RESET="\033[0m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033
 
 # Print sucess message
 print_success() {
-  echo -e "${GREEN}success: ${1}${RESET}"
+	echo -e "${GREEN}success: ${1}${RESET}"
 }
 
 # Print warn message
 print_warn() {
-  echo -e "${ORANGE}warn: ${1}${RESET}"
+	echo -e "${ORANGE}warn: ${1}${RESET}"
 }
 
 # Throw error
 throw_error() {
-  echo -e "${RED}error: ${1}${RESET}"
-  exit 1
+	echo -e "${RED}error: ${1}${RESET}"
+	exit 1
 }
 
 # Ask user
 ask_user() {
-  echo -e -n "${CYAN}${1} ${GRAY}(${2})${RESET} "
+	echo -e -n "${CYAN}${1} ${GRAY}(${2})${RESET} "
 }
 
 # Check if git command exists
@@ -60,8 +60,8 @@ read -r another_output_file
 
 # Create output file if does not exist
 if ! [ -f "$output_file" ]; then
-  touch "$output_file" || throw_error "failed to create ${output_file} file"
-  print_success "new file ${output_file} created"
+	touch "$output_file" || throw_error "failed to create ${output_file} file"
+	print_success "new file ${output_file} created"
 fi
 
 # Check write permission for output file
@@ -83,61 +83,61 @@ commit_types=($(jq -r ".commit_types[].type" "$config_file" 2> /dev/null))
 
 # Iterate through commit types, search for section commits and add each commit type to regex
 for commit_type in "${commit_types[@]}"; do
-  # Get section
-  section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
-  [[ -z "$section" || "$section" == "null" ]] && print_warn "${commit_type} section not found in config file" && section="$commit_type"
-  section_commits=$(git log ${last_version:+${last_version}...}HEAD --no-merges --pretty=format:'%h %s' --reverse | grep -Ei "^[[:alnum:]]{7} ${commit_type}(\(.+\))?(:|!:).+")
-  section_commits_written_count=0
-  printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
-  if [ -n "$section_commits" ]; then
-    echo -e "\n## ${section}" >> "$output_file" || throw_error "failed to write to ${output_file} file"
-    # Iterate through commits, extract data and write to output file
-    while read -r commit; do
-      commit_hash=$(echo "$commit" | cut -d ' ' -f1)
-      commit_content=$(echo "$commit" | cut -d ' ' -f2-)
-      commit_scope=$(echo "$commit_content" | cut -d ':' -f1 | awk -F '[()]' '{print $2}' | sed 's/^ *//; s/ *$//')
-      commit_message=$(echo "$commit_content" | cut -d ':' -f2- | sed 's/^ *//' | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
-      commit_body=$(git log -n 1 --pretty=format:'%b' "$commit_hash")
-      commit_refs=$(echo "$commit_body" | grep -o '#[0-9]\+' | tr '\n' ',' | sed 's/,$//')
-      commit_break=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.\+)}!:" || echo "$commit_body" | grep -i "breaking change:.\+")
-      commit_entry="- ${commit_break:+[⚠] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
-      echo "$commit_entry" >> "$output_file" || throw_error "failed to write to ${output_file} file"
-      if [ -n "$commit_break" ]; then
-        breaking_changes=$(echo "$commit_body" | grep -oi 'breaking change:.\+' | sed 's/^breaking change: */  - \*\*BREAKING CHANGE:\*\* /gi')
-        if [ -n "$breaking_changes" ]; then
-          echo "$breaking_changes" >> "$output_file" || throw_error "failed to write to ${output_file} file"
-        fi
-        major_update=true
-      elif [ "$commit_type" == "feat" ]; then
-        minor_update=true
-      fi
-      ((total_commits_written_count++))
-      ((section_commits_written_count++))
-      printf "\r%-25s${BLUE}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
-    done <<< "$section_commits"
-  fi
-  printf "\n"
-  commit_types_regex+="${commit_types_regex:+|}${commit_type}"
+	# Get section
+	section=$(jq -r ".commit_types[] | select(.type == \"$commit_type\") | .section" "$config_file")
+	[[ -z "$section" || "$section" == "null" ]] && print_warn "${commit_type} section not found in config file" && section="$commit_type"
+	section_commits=$(git log ${last_version:+${last_version}...}HEAD --no-merges --pretty=format:'%h %s' --reverse | grep -Ei "^[[:alnum:]]{7} ${commit_type}(\(.+\))?(:|!:).+")
+	section_commits_written_count=0
+	printf "%-25s${GRAY}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
+	if [ -n "$section_commits" ]; then
+		echo -e "\n## ${section}" >> "$output_file" || throw_error "failed to write to ${output_file} file"
+		# Iterate through commits, extract data and write to output file
+		while read -r commit; do
+			commit_hash=$(echo "$commit" | cut -d ' ' -f1)
+			commit_content=$(echo "$commit" | cut -d ' ' -f2-)
+			commit_scope=$(echo "$commit_content" | cut -d ':' -f1 | awk -F '[()]' '{print $2}' | sed 's/^ *//; s/ *$//')
+			commit_message=$(echo "$commit_content" | cut -d ':' -f2- | sed 's/^ *//' | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
+			commit_body=$(git log -n 1 --pretty=format:'%b' "$commit_hash")
+			commit_refs=$(echo "$commit_body" | grep -o '#[0-9]\+' | tr '\n' ',' | sed 's/,$//')
+			commit_break=$(echo "$commit_content" | grep "^${commit_type}${commit_scope:+(.\+)}!:" || echo "$commit_body" | grep -i "breaking change:.\+")
+			commit_entry="- ${commit_break:+[⚠] }${commit_scope:+**${commit_scope}:** }${commit_message} ${commit_refs:+(${commit_refs}) }([${commit_hash}](${repo_url}/commit/${commit_hash}))"
+			echo "$commit_entry" >> "$output_file" || throw_error "failed to write to ${output_file} file"
+			if [ -n "$commit_break" ]; then
+				breaking_changes=$(echo "$commit_body" | grep -oi 'breaking change:.\+' | sed 's/^breaking change: */	- \*\*BREAKING CHANGE:\*\* /gi')
+				if [ -n "$breaking_changes" ]; then
+					echo "$breaking_changes" >> "$output_file" || throw_error "failed to write to ${output_file} file"
+				fi
+				major_update=true
+			elif [ "$commit_type" == "feat" ]; then
+				minor_update=true
+			fi
+			((total_commits_written_count++))
+			((section_commits_written_count++))
+			printf "\r%-25s${BLUE}--> ${section_commits_written_count} commit(s) written${RESET}" "$section"
+		done <<< "$section_commits"
+	fi
+	printf "\n"
+	commit_types_regex+="${commit_types_regex:+|}${commit_type}"
 done
 
 # Search for unconventional commits
 nc_commits=$(git log ${last_version:+${last_version}...}HEAD --no-merges --pretty=format:'%h %s' --reverse | grep -Eiv "^[[:alnum:]]{7} (${commit_types_regex})(\(.+\))?(:|!:).+")
 if [ -n "$nc_commits" ]; then
-  nc_section="Unconventional commits"
-  nc_commits_written_count=0
-  printf "${GRAY}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "${nc_section}"
-  echo -e "\n## ${nc_section}" >> "$output_file" || throw_error "failed to write to ${output_file} file"
-  # Iterate through unconventional commits, extract data and write to output file
-  while read -r commit; do
-    commit_hash=$(echo "$commit" | cut -d ' ' -f1)
-    commit_content=$(echo "$commit" | cut -d ' ' -f2-)
-    commit_entry="- ${commit_content} ([${commit_hash}](${repo_url}/commit/${commit_hash}))"
-    echo "$commit_entry" >> "$output_file" || throw_error "failed to write to ${output_file} file"
-    ((total_commits_written_count++))
-    ((nc_commits_written_count++))
-    printf "\r${RED}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "$nc_section"
-  done <<< "$nc_commits"
-  printf "\n"
+	nc_section="Unconventional commits"
+	nc_commits_written_count=0
+	printf "${GRAY}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "${nc_section}"
+	echo -e "\n## ${nc_section}" >> "$output_file" || throw_error "failed to write to ${output_file} file"
+	# Iterate through unconventional commits, extract data and write to output file
+	while read -r commit; do
+		commit_hash=$(echo "$commit" | cut -d ' ' -f1)
+		commit_content=$(echo "$commit" | cut -d ' ' -f2-)
+		commit_entry="- ${commit_content} ([${commit_hash}](${repo_url}/commit/${commit_hash}))"
+		echo "$commit_entry" >> "$output_file" || throw_error "failed to write to ${output_file} file"
+		((total_commits_written_count++))
+		((nc_commits_written_count++))
+		printf "\r${RED}%-25s--> ${nc_commits_written_count} commit(s) written${RESET}" "$nc_section"
+	done <<< "$nc_commits"
+	printf "\n"
 fi
 
 # Print total commits written count / total commits count
@@ -146,20 +146,20 @@ echo -e "Total: $( [ "$total_commits_written_count" -eq "$total_commits_count" ]
 
 # Detect new version (if last version does not exist, new version is set as the initial version)
 if [ -n "$last_version" ]; then
-  if [ "$major_update" == true ]; then
-    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$1++; $2=0; $3=0; print}')
-    echo -e "${YELLOW}MAJOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
-  elif [ "$minor_update" == true ]; then
-    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$2++; $3=0; print}')
-    echo -e "${YELLOW}MINOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
-  else
-    new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$3++; print}')
-    echo -e "${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
-  fi
+	if [ "$major_update" == true ]; then
+		new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$1++; $2=0; $3=0; print}')
+		echo -e "${YELLOW}MAJOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+	elif [ "$minor_update" == true ]; then
+		new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$2++; $3=0; print}')
+		echo -e "${YELLOW}MINOR UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+	else
+		new_version=$(echo "$last_version" | awk -F '.' -v OFS='.' '{$3++; print}')
+		echo -e "${YELLOW}PATCH UPDATE detected:${RESET} ${last_version} --> ${new_version}"
+	fi
 else
-  new_version=$(jq -r ".initial_version" "$config_file")
-  [[ -z "$new_version" || "$new_version" == "null" ]] && print_warn "initial version not found in config file" && new_version="0.1.0"
-  echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
+	new_version=$(jq -r ".initial_version" "$config_file")
+	[[ -z "$new_version" || "$new_version" == "null" ]] && print_warn "initial version not found in config file" && new_version="0.1.0"
+	echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
 # Ask user for choose another version
@@ -177,12 +177,12 @@ ask_user "Bump version?" "[Y/n]"
 read -r bump_version
 bump_version_lw=$(echo "$bump_version" | tr '[[:upper:]]' '[[:lower]]')
 if [ "$bump_version_lw" != "n" ]; then
-  bump_commit_entry="bump: version ${last_version:+${last_version} → }${new_version}"
-  if git add "$output_file" && git commit "$output_file" -m "$bump_commit_entry" > /dev/null && git tag "$new_version"; then
-    print_success "version bumped ${last_version:+from ${last_version} }to ${new_version}"
-  else
-    print_warn "failed to bump version"
-  fi
+	bump_commit_entry="bump: version ${last_version:+${last_version} → }${new_version}"
+	if git add "$output_file" && git commit "$output_file" -m "$bump_commit_entry" > /dev/null && git tag "$new_version"; then
+		print_success "version bumped ${last_version:+from ${last_version} }to ${new_version}"
+	else
+		print_warn "failed to bump version"
+	fi
 fi
 
 # Exit script
