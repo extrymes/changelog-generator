@@ -37,8 +37,11 @@ fi
 # Check if config file exists
 [ -f "$config_file" ] || throw_error "${config_file} file not found"
 
-# Check if bin directory exists
-[ -d "$bin_dir" ] || throw_error "directory ${bin_dir} not found"
+# Create bin directory if does not exist
+if ! [ -d "$bin_dir" ]; then
+  mkdir -p "$bin_dir" || throw_error "failed to create ${bin_dir} directory"
+  print_success "new directory ${bin_dir} created"
+fi
 
 # Create gch directory if does not exist
 if ! [ -d "$gch_dir" ]; then
