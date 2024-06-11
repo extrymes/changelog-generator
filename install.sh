@@ -103,11 +103,11 @@ if [[ ":$PATH:" != *":$gch_dir:"* ]]; then
 	check_return_code
 fi
 
-# Launch new shell instance
-$shell
-
 # Print gch usage
 echo -e "\nYou can now run ${BLUE}${BOLD}gch${RESET} in a local repository."
+
+# Launch new shell instance
+$shell
 
 # Exit script
 exit 0
