@@ -13,41 +13,35 @@ A simple Bash script that generates a changelog from commits in a local reposito
 - [git](https://git-scm.com)
 - [jq](https://jqlang.github.io/jq)
 
-## 🛠️ Installation
-Make sure you have installed the dependencies before proceeding. You can install gch automatically or manually.
-### Automatically
-1. Just run the `setup` file
+## 🚀 Getting started
+Make sure you have installed the dependencies before proceeding. The quick install is recommended.
+### Quick install
 ```bash
-chmod +x setup
-sudo ./setup
+bash -c 'bash <(curl -s https://raw.githubusercontent.com/extrymes/changelog-generator/main/install.sh)'
 ```
 ### Manually
-1. Make `gch` file executable
+1. Clone the repository
+```bash
+git clone https://github.com/extrymes/changelog-generator.git
+cd changelog-generator
+```
+2. Make the `gch` file executable
 ```bash
 chmod +x gch
-``` 
-2. Copy `gch` file to `/usr/local/bin` directory
-```bash
-sudo cp gch /usr/local/bin
 ```
-3. Copy `config.json` file to a new `/etc/gch` directory
+3. Add the directory to the PATH (for exemple)
 ```bash
-sudo mkdir -p /etc/gch
-sudo cp config.json /etc/gch
-```
-4. Add `/usr/local/bin` directory to PATH **(only if not already there)**
-```bash
-echo "export PATH=\"/usr/local/bin:\$PATH\"" >> ~/.bashrc # or .zshrc
-source ~/.bashrc # or .zshrc
+echo "export PATH=\"/\$HOME/.local/changelog-generator:\$PATH\"" >> ~/.zshrc # or .bashrc
+source ~/.zshrc # or .bashrc
 ```
 ## ⚙️ Configuration
 You can configure these keys in config file:
 - `output_file`: The file to which the changelog will be written
 - `initial_version`: The version of the first update
 - `commit_types`: The array of commit types and sections
-> Run the `setup` file to copy changes or directly configure in `/etc/gch/config.json` file.
+> The config file is located in the same directory as executable: `$HOME/.local/changelog-generator/config.json`
 
-## 🚀 Getting started
+## 💡 Usage
 1. Go to a local repository
 2. Run `gch`
 
