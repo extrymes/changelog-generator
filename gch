@@ -68,7 +68,7 @@ output_file=$(jq -r ".output_file" "$config_file")
 [[ -z "$output_file" || "$output_file" == "null" ]] && print_warn "output file not found in config file" && output_file="CHANGELOG.md"
 echo -e "${YELLOW}Output file:${RESET} ${output_file}"
 
-# Ask user for choose another output file
+# Ask user to choose another output file
 ask_user "Choose another file ?" "press [Enter] to skip"
 read -r another_output_file
 [ -n "$another_output_file" ] && output_file="$another_output_file"
@@ -177,7 +177,7 @@ else
 	echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
 fi
 
-# Ask user for choose another version
+# Ask user to choose another version
 ask_user "Choose another version?" "press [Enter] to skip"
 read -r another_version
 [ -n "$another_version" ] && new_version="$another_version"
@@ -187,7 +187,7 @@ title_entry="# Release $([ -n "$last_version" ] && echo "[${new_version}](${repo
 echo "$title_entry" | cat - "$output_file" > temp && mv temp "$output_file" || throw_error "failed to write to ${output_file} file"
 print_success "new changelog ${new_version} generated"
 
-# Ask user for bump version
+# Ask user to bump version
 ask_user "Bump version?" "[Y/n]"
 read -n 1 -r bump_version
 if ! [[ $bump_version =~ ^[Nn]$ ]]; then

@@ -43,16 +43,19 @@ function ask_user() {
 	fi
 }
 
+# Print installer options
 echo -e "${BOLD}Welcome to the changelog generator installer!${RESET}"
 echo "Please choose an option:"
 echo -e "${YELLOW}I${RESET} - Install/update gch (latest version)"
 echo -e "${YELLOW}U${RESET} - Uninstall gch"
 echo -e "${YELLOW}Q${RESET} - Quit"
 
+# Ask user to choose an option
 echo -ne "${CYAN}Your choice:${RESET} "
 read -n 1 -r
 echo
 
+# Save user choice
 save_reply=$REPLY
 
 # Check if choice is valid
@@ -71,7 +74,7 @@ if [[ $save_reply =~ ^[Uu]$ ]]; then
 	exit 0
 fi
 
-# Ask user for install gch
+# Ask user to install gch
 ask_user "Are you sure you want to install gch?" "[Y/n]"
 
 # Create gch directory if does not exist
