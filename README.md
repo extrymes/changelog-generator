@@ -9,7 +9,7 @@ A simple Bash script that generates a changelog from commits in a local reposito
 - Automated version bump
 - Conforms to [Conventional Commits](https://conventionalcommits.org) and [SemVer](https://semver.org)
 
-## 📦 Dependencies
+## 📦 Requirement
 - [git](https://git-scm.com)
 - [jq](https://jqlang.github.io/jq)
 
