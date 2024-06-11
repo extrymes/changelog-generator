@@ -7,24 +7,24 @@ set -o pipefail
 RESET="\033[0m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; CYAN="\033[36m"; ORANGE="\033[38;5;208m"
 
 # Print sucess message
-print_success() {
+function print_success() {
 	echo -e "${GREEN}success: ${1}${RESET}"
 }
 
 # Print warn message
-print_warn() {
+function print_warn() {
 	echo -e "${ORANGE}warn: ${1}${RESET}"
 }
 
 # Throw error
-throw_error() {
+function throw_error() {
 	echo -e "${RED}error: ${1}${RESET}"
 	exit 1
 }
 
 # Ask user
-ask_user() {
-	echo -e -n "${CYAN}${1} ${GRAY}(${2})${RESET} "
+function ask_user() {
+	echo -ne "${CYAN}${1} ${GRAY}(${2})${RESET} "
 }
 
 # Check if git command exists
@@ -177,9 +177,8 @@ print_success "new changelog ${new_version} generated"
 
 # Ask user for bump version
 ask_user "Bump version?" "[Y/n]"
-read -r bump_version
-bump_version_lw=$(echo "$bump_version" | tr '[[:upper:]]' '[[:lower]]')
-if [ "$bump_version_lw" != "n" ]; then
+read -n 1 -r bump_version
+if ! [[ $bump_version =~ ^[Nn]$ ]]; then
 	bump_commit_entry="bump: version ${last_version:+${last_version} → }${new_version}"
 	if git add "$output_file" && git commit "$output_file" -m "$bump_commit_entry" > /dev/null && git tag "$new_version"; then
 		print_success "version bumped ${last_version:+from ${last_version} }to ${new_version}"
