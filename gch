@@ -33,8 +33,11 @@ command -v git &> /dev/null || throw_error "git is not installed (https://git-sc
 # Check if jq command exists
 command -v jq &> /dev/null || throw_error "jq is not installed (https://jqlang.github.io/jq/download)"
 
+# Get gch dir
+gch_dir=$(dirname "$0")
+
 # Get config file
-config_file="/etc/gch/config.json"
+config_file="$gch_dir/config.json"
 [ -f "$config_file" ] || throw_error "file ${config_file} not found"
 
 # Get remote repository URL (without SSH protocol and .git extension)
