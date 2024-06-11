@@ -6,6 +6,9 @@ set -o pipefail
 # Configure colors
 RESET="\033[0m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; CYAN="\033[36m"; ORANGE="\033[38;5;208m"
 
+# Set gch version
+gch_version="1.0.1"
+
 # Print sucess message
 function print_success() {
 	echo -e "${GREEN}success: ${1}${RESET}"
@@ -32,6 +35,15 @@ command -v git &> /dev/null || throw_error "git is not installed (https://git-sc
 
 # Check if jq command exists
 command -v jq &> /dev/null || throw_error "jq is not installed (https://jqlang.github.io/jq/download)"
+
+# Get gch last version
+gch_last_version=$(curl -s https://api.github.com/repos/extrymes/changelog-generator/releases/latest | jq -r .tag_name)
+
+# Check if new gch release is available
+if [ "$gch_version" != "$gch_last_version" ]; then
+	echo -e "${GREEN}New gch release available! ($gch_version --> $gch_last_version)${RESET}"
+	echo -e "Run: ${GRAY}bash -c 'bash <(curl -s https://raw.githubusercontent.com/extrymes/changelog-generator/main/install.sh)'${RESET}\n"
+fi
 
 # Get gch dir
 gch_dir=$(dirname "$0")
