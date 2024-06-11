@@ -4,7 +4,7 @@
 set -o pipefail
 
 # Configure colors
-RESET="\033[0m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; CYAN="\033[36m"; ORANGE="\033[38;5;208m"
+RESET="\033[0m"; BOLD="\033[1m"; GRAY="\033[30m"; RED="\033[31m"; GREEN="\033[32m"; YELLOW="\033[33m"; BLUE="\033[34m"; CYAN="\033[36m"; ORANGE="\033[38;5;208m"
 
 # Set gch version
 gch_version="1.0.1"
