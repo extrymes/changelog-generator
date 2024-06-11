@@ -1,14 +1,19 @@
-# Release [0.5.1](https://github.com/extrymes/changelog-generator/compare/0.5.0...0.5.1) (2024-02-20)
+# Release [1.0.0](https://github.com/extrymes/changelog-generator/compare/0.5.1...1.0.0) (2024-06-11)
+
+## Features
+- [⚠] Add install.sh for quick install ([e994d76](https://github.com/extrymes/changelog-generator/commit/e994d76))
+	- **BREAKING CHANGE:** The installation location of gch has been changed. The script is no longer installed in a directory that is included in the PATH environment variable by default. Please run install.sh or add the new directory manually to the PATH.
+- **gch:** Get gch directory automatically ([a367d84](https://github.com/extrymes/changelog-generator/commit/a367d84))
 
 ## Bug Fixes
-- **gch:** Get remote repository URL without SSH protocol ([cab6321](https://github.com/extrymes/changelog-generator/commit/cab6321))
+- **setup:** Create bin directory if does not exist ([6d1737f](https://github.com/extrymes/changelog-generator/commit/6d1737f))
 
 ## Refactor
-- **gch:** Check file cleanup to make code more robust ([1c2acc9](https://github.com/extrymes/changelog-generator/commit/1c2acc9))
-- Clean code ([d514c53](https://github.com/extrymes/changelog-generator/commit/d514c53))
+- Replace spaces with tabs for indentation ([2b30a41](https://github.com/extrymes/changelog-generator/commit/2b30a41))
+- **gch:** Clean code ([5b00bb7](https://github.com/extrymes/changelog-generator/commit/5b00bb7))
 
 ## Chore
-- **setup:** Fix variable name `shell_config_file` ([8136e74](https://github.com/extrymes/changelog-generator/commit/8136e74))
+- Remove unnecessary setup file ([c055c6a](https://github.com/extrymes/changelog-generator/commit/c055c6a))
 
 ## Documentation
-- Update README.md ([f0ab0c0](https://github.com/extrymes/changelog-generator/commit/f0ab0c0))
+- Update README.md ([9fd0023](https://github.com/extrymes/changelog-generator/commit/9fd0023))
