@@ -80,18 +80,18 @@ ask_user "Are you sure you want to install gch?" "[Y/n]"
 # Create gch directory if does not exist
 if ! [ -d $gch_dir ]; then
 	echo -n "Creating directory... "
-	mkdir -p $gch_dir
+	mkdir -p $gch_dir &> /dev/null
 	check_return_code
 fi
 
 # Download gch file
 echo -n "Downloading gch... "
-curl -L $gch_url -o $gch_dir/gch &> /dev/null
+curl -sL $gch_url -o $gch_dir/gch
 check_return_code
 
 # Download config file
 echo -n "Downloading config file... "
-curl -L $config_url -o $gch_dir/config.json &> /dev/null
+curl -sL $config_url -o $gch_dir/config.json
 check_return_code
 
 # Make gch file executable
