@@ -190,6 +190,7 @@ print_success "new changelog ${new_version} generated"
 # Ask user to bump version
 ask_user "Bump version?" "[Y/n]"
 read -n 1 -r bump_version
+echo
 if ! [[ $bump_version =~ ^[Nn]$ ]]; then
 	bump_commit_entry="bump: version ${last_version:+${last_version} → }${new_version}"
 	if git add "$output_file" && git commit "$output_file" -m "$bump_commit_entry" > /dev/null && git tag "$new_version"; then
