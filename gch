@@ -40,7 +40,7 @@ command -v jq &> /dev/null || throw_error "jq is not installed (https://jqlang.g
 gch_last_version=$(curl -s https://api.github.com/repos/extrymes/changelog-generator/releases/latest | jq -r .tag_name)
 
 # Check if new gch release is available
-if [ "$gch_version" != "$gch_last_version" ]; then
+if [[ "$gch_version" < "$gch_last_version" ]]; then
 	echo -e "${GREEN}New gch release available! ($gch_version --> $gch_last_version)${RESET}"
 	echo -e "Run: ${GRAY}bash -c 'bash <(curl -s https://raw.githubusercontent.com/extrymes/changelog-generator/main/install.sh)'${RESET}\n"
 fi
