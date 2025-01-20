@@ -174,7 +174,7 @@ if [ -n "$last_version" ]; then
 else
 	new_version=$(jq -r ".initial_version" "$config_file")
 	[[ -z "$new_version" || "$new_version" == "null" ]] && print_warn "initial version not found in config file" && new_version="0.1.0"
-	echo -e "${YELLOW}FIRST UPDATE detected:${RESET} ${new_version}"
+	echo -e "${YELLOW}FIRST RELEASE detected:${RESET} ${new_version}"
 fi
 
 # Ask user to choose another version
